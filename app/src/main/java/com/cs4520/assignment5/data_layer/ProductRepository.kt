@@ -34,7 +34,7 @@ class ProductRepository(
                 try {
                     // Fetch products from API and attempt to create valid Product representations
                     val respToProducts = resp.body()!!
-                        .map { Product.create(it.name, it.type, it.expiryDate, it.price)!! }
+                        .map { Product(it.name, it.expiryDate, it.price, it.type)!! }
                     // Filter out any duplicates from api
                     for (product in respToProducts) {
                         if (!setOfProducts.any { Product.compareProduct(product, it) }) {
@@ -73,8 +73,10 @@ class ProductRepository(
 
 
     suspend fun insertProducts(products: List<Product>) {
-        db.productDao()
-            .insertAllProducts(products.map { ProductToDAOMapper.productToProductEntity(it) })
+        products.map { ProductToDAOMapper.productToProductEntity(it) }.let {
+            db.productDao()
+                .insertAllProducts(it)
+        }
     }
 
     /**

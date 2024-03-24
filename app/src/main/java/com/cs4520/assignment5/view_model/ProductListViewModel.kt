@@ -11,16 +11,23 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import com.cs4520.assignment5.application.ProductApplication
 import com.cs4520.assignment5.data_layer.ProductRepository
 import com.cs4520.assignment5.model.Product
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ProductListViewModel(private val repository: ProductRepository) : ViewModel() {
 
 
-    private val _products = MutableLiveData<List<Product>>()
-    val products: LiveData<List<Product>> = _products
+    private val _products = MutableStateFlow<List<Product>>(emptyList())
+    val products: StateFlow<List<Product>> get() = _products.asStateFlow()
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
+
+    init {
+        fetchProducts(1)
+    }
 
 
     fun fetchProducts(page: Int?) {
