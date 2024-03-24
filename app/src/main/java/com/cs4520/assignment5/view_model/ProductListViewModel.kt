@@ -22,11 +22,11 @@ class ProductListViewModel(private val repository: ProductRepository) : ViewMode
     private val _products = MutableStateFlow<List<Product>>(emptyList())
     val products: StateFlow<List<Product>> get() = _products.asStateFlow()
 
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
+    private val _isLoading = MutableStateFlow<Boolean>(true)
+    val isLoading: StateFlow<Boolean> get() = _isLoading.asStateFlow()
 
     init {
-        fetchProducts(1)
+        fetchProducts(3)
     }
 
 
