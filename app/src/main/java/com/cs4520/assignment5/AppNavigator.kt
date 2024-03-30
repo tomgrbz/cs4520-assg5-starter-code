@@ -14,7 +14,6 @@ fun AppNavigator(productRepo: ProductRepository) {
     NavHost(navController = navController, startDestination = "productList") {
         composable("login") { LoginScreen(onLoginSuccess = { navController.navigate("productList") }) }
          composable("productList") { ProductListScreen(productRepo) }
-        // Add other destinations
     }
 }
 

@@ -29,8 +29,14 @@ class ProductRepository(
         val setOfProducts: MutableSet<Product> = mutableSetOf()
         if (checkNetworkConn()) {
             val resp = apiService.getProducts(page)
-            Log.i("ProductRepo", "Fetched records: ${resp.toString()}")
-            if (resp.isSuccessful && resp.body() != null) {
+            Log.i("ProductRepo", "Fetched records: ${resp}")
+            if (!resp.isSuccessful) {
+                return withContext(Dispatchers.IO) {
+                    getProductsFromDB()
+                }
+            }
+
+            else if (resp.isSuccessful && resp.body() != null && resp.body()!!.isNotEmpty()) {
                 try {
                     // Fetch products from API and attempt to create valid Product representations
                     val respToProducts = resp.body()!!
