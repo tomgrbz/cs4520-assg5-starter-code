@@ -19,7 +19,7 @@ class AppContainer {
 
     lateinit var productRepository: ProductRepository // ProductRepository(remoteDataSource, localDataSource);
     // If there is already a ProductRepository instance, as Singleton representation
-    var instance: Boolean = false
+    private var instance: Boolean = false
 
     fun createLocalDataSource(context: Context) {
         localDataSource = Room.databaseBuilder(context, LocalDatabase::class.java, "productsDB").build()
@@ -27,6 +27,7 @@ class AppContainer {
     fun createProductRepository(context: Context) {
         if (!instance && this::localDataSource.isInitialized) {
             productRepository = ProductRepository(remoteDataSource, localDataSource, context)
+            instance = true
         }
     }
 }

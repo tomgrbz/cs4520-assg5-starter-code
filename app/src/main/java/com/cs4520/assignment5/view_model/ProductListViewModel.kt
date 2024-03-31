@@ -37,11 +37,12 @@ class ProductListViewModel(private val repository: ProductRepository, ctx: Conte
     init {
         fetchProducts((1..10).random())
         scheduleProductRefresh(ctx)
+
     }
 
     fun scheduleProductRefresh(context: Context) {
         val workManger = WorkManagerSingleton.getInstance(context = context);
-        val workRequest = PeriodicWorkRequestBuilder<RefreshDataWorker>(1, TimeUnit.HOURS)
+        val workRequest = PeriodicWorkRequestBuilder<RefreshDataWorker>(15, TimeUnit.MINUTES)
             .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
             .build()
 
@@ -51,9 +52,6 @@ class ProductListViewModel(private val repository: ProductRepository, ctx: Conte
             workRequest
         )
     }
-
-
-
     fun fetchProducts(page: Int?) {
         // Loading bar should start to spin
         _isLoading.value = true

@@ -30,7 +30,7 @@ class ProductRepository(
         if (checkNetworkConn()) {
             val resp = apiService.getProducts(page)
             Log.i("ProductRepo", "Fetched records: ${resp}")
-            if (!resp.isSuccessful) {
+            if (!resp.isSuccessful || resp.body() == null || resp.body()!!.isEmpty()) {
                 return withContext(Dispatchers.IO) {
                     getProductsFromDB()
                 }
