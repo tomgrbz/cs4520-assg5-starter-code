@@ -27,10 +27,10 @@ class ProductRepository(
     suspend fun getProducts(page: Int?): List<Product> {
         val setOfProducts: MutableSet<Product> = mutableSetOf()
         try {
+            // Check for network connection
             if (checkNetworkConn()) {
-
                 val resp = apiService.getProducts(page)
-
+                // If request is failed or malformed, return db entries
                 if (!resp.isSuccessful || resp.body() == null || resp.body()!!.isEmpty()) {
                     return withContext(Dispatchers.IO) {
                         getProductsFromDB()
@@ -78,14 +78,14 @@ class ProductRepository(
         return emptyList()
     }
 
-    suspend fun getProductsFromDB(): List<Product> {
+    private suspend fun getProductsFromDB(): List<Product> {
         val productEntities = db.productDao()
             .fetchAllProducts()
         return productEntities.map { ProductToDAOMapper.productEntityToProduct(it)!! }
     }
 
 
-    suspend fun insertProducts(products: List<Product>) {
+    private suspend fun insertProducts(products: List<Product>) {
         products.map { ProductToDAOMapper.productToProductEntity(it) }.let {
             db.productDao()
                 .insertAllProducts(it)

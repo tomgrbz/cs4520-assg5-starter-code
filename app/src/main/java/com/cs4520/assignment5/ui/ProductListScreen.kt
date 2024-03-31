@@ -20,8 +20,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cs4520.assignment5.application.ProductApplication
 
+/**
+ * Composable function representing the view of list of products
+ * fetched from API. Uses lazy column composable to process product row composables.
+ */
 @Composable
-fun ProductListScreen(productRepo: ProductRepository) {
+fun ProductListScreen() {
     val viewModel: ProductListViewModel = viewModel(factory = ProductListViewModel.Factory)
     val products by viewModel.products.collectAsState()
     val loading by viewModel.isLoading.collectAsState()

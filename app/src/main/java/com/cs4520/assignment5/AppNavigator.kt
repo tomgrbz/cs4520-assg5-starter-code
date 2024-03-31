@@ -9,11 +9,11 @@ import com.cs4520.assignment5.ui.LoginScreen
 import com.cs4520.assignment5.ui.ProductListScreen
 
 @Composable
-fun AppNavigator(productRepo: ProductRepository) {
+fun AppNavigator() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "productList") {
+    NavHost(navController = navController, startDestination = "login") {
         composable("login") { LoginScreen(onLoginSuccess = { navController.navigate("productList") }) }
-         composable("productList") { ProductListScreen(productRepo) }
+        composable("productList") { ProductListScreen() }
     }
 }
 
