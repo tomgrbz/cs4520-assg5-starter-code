@@ -8,7 +8,6 @@ import com.cs4520.assignment5.model.Product
 import com.cs4520.assignment5.model.ProductToDAOMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.lang.Exception
 
 /**
  * Client consisting of local DB source and remote API source of data for a Product list
@@ -27,17 +26,17 @@ class ProductRepository(
      */
     suspend fun getProducts(page: Int?): List<Product> {
         val setOfProducts: MutableSet<Product> = mutableSetOf()
-        if (checkNetworkConn()) {
-            val resp = apiService.getProducts(page)
-            Log.i("ProductRepo", "Fetched records: ${resp}")
-            if (!resp.isSuccessful || resp.body() == null || resp.body()!!.isEmpty()) {
-                return withContext(Dispatchers.IO) {
-                    getProductsFromDB()
-                }
-            }
+        try {
+            if (checkNetworkConn()) {
 
-            else if (resp.isSuccessful && resp.body() != null && resp.body()!!.isNotEmpty()) {
-                try {
+                val resp = apiService.getProducts(page)
+
+                if (!resp.isSuccessful || resp.body() == null || resp.body()!!.isEmpty()) {
+                    return withContext(Dispatchers.IO) {
+                        getProductsFromDB()
+                    }
+                } else if (resp.isSuccessful && resp.body() != null && resp.body()!!.isNotEmpty()) {
+
                     // Fetch products from API and attempt to create valid Product representations
                     val respToProducts = resp.body()!!
                         .map { Product(it.name, it.expiryDate, it.price, it.type)!! }
@@ -47,6 +46,7 @@ class ProductRepository(
                             setOfProducts.add(product)
                         }
                     }
+
                     // Insert set of products in DB
                     try {
                         withContext(Dispatchers.IO) {
@@ -54,15 +54,22 @@ class ProductRepository(
                         }
                     } catch (e: Exception) {
                         Log.e("ProductListViewModel", e.toString())
+                        return withContext(Dispatchers.IO) {
+                            getProductsFromDB()
+                        }
                     }
                     return setOfProducts.toList()
-                } catch (e: Exception) {
-                    Log.e("ProductRepo", "Failed to fetch any records from API")
-                }
 
+
+                }
+            } else {
+                // There is no internet connection, so will return records from DB
+                return withContext(Dispatchers.IO) {
+                    getProductsFromDB()
+                }
             }
-        } else {
-            // There is no internet connection, so will return records from DB
+            // Some error occurred either during deserialization or network
+        } catch (e: Exception) {
             return withContext(Dispatchers.IO) {
                 getProductsFromDB()
             }

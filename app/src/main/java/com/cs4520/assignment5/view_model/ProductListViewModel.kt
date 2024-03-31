@@ -55,11 +55,11 @@ class ProductListViewModel(private val repository: ProductRepository, ctx: Conte
     fun fetchProducts(page: Int?) {
         // Loading bar should start to spin
         _isLoading.value = true
+
         viewModelScope.launch {
             try {
                 // Fetch from API, on failure will return DB records instead to display in View
-                val response: List<Product> =
-                    repository.getProducts(page)
+                val response = repository.getProducts(page)
                 _products.value = response
             } catch (e: Exception) {
                 // Handle error, setting value of list to empty
